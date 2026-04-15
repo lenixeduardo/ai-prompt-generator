@@ -1,0 +1,33 @@
+services:
+  # ── Backend: Fastify API ──────────────────────────────────────────
+  - type: web
+    name: ai-prompt-generator-api
+    runtime: node
+    rootDir: backend
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: ANTHROPIC_API_KEY
+        sync: false          # definir manualmente no dashboard
+      - key: FRONTEND_URL
+        sync: false          # definir após o frontend subir
+
+  # ── Frontend: Next.js ────────────────────────────────────────────
+  - type: web
+    name: ai-prompt-generator-frontend
+    runtime: node
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: API_URL
+        sync: false          # definir com a URL do backend acima
