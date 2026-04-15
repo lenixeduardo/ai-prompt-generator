@@ -3,31 +3,29 @@ services:
   - type: web
     name: ai-prompt-generator-api
     runtime: node
-    rootDir: backend
-    buildCommand: npm install && npm run build
-    startCommand: npm run start
+    buildCommand: cd backend && npm install && npm run build
+    startCommand: cd backend && node dist/server.js
     healthCheckPath: /health
     envVars:
       - key: NODE_ENV
         value: production
-      - key: PORT
-        value: 10000
+      - key: NODE_VERSION
+        value: 20
       - key: ANTHROPIC_API_KEY
-        sync: false          # definir manualmente no dashboard
+        sync: false
       - key: FRONTEND_URL
-        sync: false          # definir após o frontend subir
+        sync: false
 
   # ── Frontend: Next.js ────────────────────────────────────────────
   - type: web
     name: ai-prompt-generator-frontend
     runtime: node
-    rootDir: frontend
-    buildCommand: npm install && npm run build
-    startCommand: npm run start
+    buildCommand: cd frontend && npm install && npm run build
+    startCommand: cd frontend && npm run start
     envVars:
       - key: NODE_ENV
         value: production
-      - key: PORT
-        value: 10000
+      - key: NODE_VERSION
+        value: 20
       - key: API_URL
-        sync: false          # definir com a URL do backend acima
+        sync: false
