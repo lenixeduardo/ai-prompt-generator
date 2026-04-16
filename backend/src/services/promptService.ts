@@ -1,6 +1,6 @@
-import Anthropic from '@anthropic-ai/sdk'
+import { GoogleGenerativeAI } from '@google/generative-ai'
 
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY ?? '')
 
 const SYSTEM_PROMPT = `You are a world-class Prompt Engineer specializing in the P-C-R-F-I framework (Precision, Context, Representation, Format, Iteration) and structured prompt architecture for Large Language Models.
 
@@ -46,18 +46,15 @@ export interface PromptOutput {
 }
 
 export async function generateStructuredPrompt(userText: string): Promise<PromptOutput> {
-  const message = await client.messages.create({
-    model: 'claude-sonnet-4-6',
-    max_tokens: 1500,
-    system: SYSTEM_PROMPT,
-    messages: [{ role: 'user', content: userText }],
+  const model = genAI.getGenerativeModel({
+    model: 'gemini-2.5-pro',
+    systemInstruction: SYSTEM_PROMPT,
+    generationConfig: { maxOutputTokens: 1500 },
   })
 
-  const block = message.content[0]
-  if (block.type !== 'text') {
-    throw new Error('Unexpected response type from Claude API')
-  }
+  const result = await model.generateContent(userText)
+  const text = result.response.text()
 
-  const parsed = JSON.parse(block.text) as PromptOutput
+  const parsed = JSON.parse(text) as PromptOutput
   return parsed
 }
