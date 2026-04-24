@@ -2,6 +2,11 @@ import Fastify from 'fastify'
 import cors from '@fastify/cors'
 import generateRoute from './routes/generate'
 
+if (!process.env.GEMINI_API_KEY) {
+  console.error('FATAL: GEMINI_API_KEY environment variable is not set.')
+  process.exit(1)
+}
+
 const server = Fastify({
   logger: {
     transport:
