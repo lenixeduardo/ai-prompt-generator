@@ -1,6 +1,6 @@
 import { GoogleGenerativeAI } from '@google/generative-ai'
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY ?? '')
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
 
 const SYSTEM_PROMPT = `You are a world-class Prompt Engineer specializing in the P-C-R-F-I framework (Precision, Context, Representation, Format, Iteration) and structured prompt architecture for Large Language Models.
 
@@ -52,16 +52,24 @@ export async function generateStructuredPrompt(userText: string): Promise<Prompt
     generationConfig: { maxOutputTokens: 2048 },
   })
 
-  const result = await model.generateContent(userText)
-  const text = result.response.text()
-
-  let parsed: PromptOutput
+  let text: string
   try {
-    parsed = JSON.parse(text) as PromptOutput
-  } catch {
-    throw Object.assign(new Error('A IA retornou uma resposta malformada. Tente novamente.'), {
-      statusCode: 502,
-    })
+    const result = await model.generateContent(userText)
+    text = result.response.text()
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err)
+    throw Object.assign(
+      new Error(`Falha ao chamar a API Gemini: ${message}`),
+      { statusCode: 502 },
+    )
   }
-  return parsed
+
+  try {
+    return JSON.parse(text) as PromptOutput
+  } catch {
+    throw Object.assign(
+      new Error('A IA retornou uma resposta malformada. Tente novamente.'),
+      { statusCode: 502 },
+    )
+  }
 }
