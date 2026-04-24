@@ -16,12 +16,23 @@ export async function POST(request: NextRequest) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
+      signal: AbortSignal.timeout(25000),
     })
   } catch (err) {
-    console.error('[proxy] falha ao conectar ao backend:', err)
+    console.error('[proxy] backend unreachable', {
+      apiUrl,
+      error: err instanceof Error ? err.message : String(err),
+      name: err instanceof Error ? err.name : 'Unknown',
+    })
+
+    const isTimeout = err instanceof Error && err.name === 'TimeoutError'
     return Response.json(
-      { message: 'Não foi possível conectar ao servidor de IA.' },
-      { status: 502 },
+      {
+        message: isTimeout
+          ? 'O servidor de IA demorou demais para responder. Aguarde alguns segundos e tente novamente.'
+          : 'Não foi possível conectar ao servidor de IA.',
+      },
+      { status: isTimeout ? 504 : 502 },
     )
   }
 
