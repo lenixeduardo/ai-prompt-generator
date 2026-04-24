@@ -49,12 +49,19 @@ export async function generateStructuredPrompt(userText: string): Promise<Prompt
   const model = genAI.getGenerativeModel({
     model: 'gemini-2.5-pro',
     systemInstruction: SYSTEM_PROMPT,
-    generationConfig: { maxOutputTokens: 1500 },
+    generationConfig: { maxOutputTokens: 2048 },
   })
 
   const result = await model.generateContent(userText)
   const text = result.response.text()
 
-  const parsed = JSON.parse(text) as PromptOutput
+  let parsed: PromptOutput
+  try {
+    parsed = JSON.parse(text) as PromptOutput
+  } catch {
+    throw Object.assign(new Error('A IA retornou uma resposta malformada. Tente novamente.'), {
+      statusCode: 502,
+    })
+  }
   return parsed
 }
