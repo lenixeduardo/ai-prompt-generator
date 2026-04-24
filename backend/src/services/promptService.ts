@@ -64,8 +64,11 @@ export async function generateStructuredPrompt(userText: string): Promise<Prompt
     )
   }
 
+  // Gemini occasionally wraps the JSON in markdown fences despite the prompt instruction
+  const clean = text.trim().replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim()
+
   try {
-    return JSON.parse(text) as PromptOutput
+    return JSON.parse(clean) as PromptOutput
   } catch {
     throw Object.assign(
       new Error('A IA retornou uma resposta malformada. Tente novamente.'),
