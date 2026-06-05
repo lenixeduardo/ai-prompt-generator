@@ -99,7 +99,7 @@ export default function PromptGenerator() {
     async (e: React.FormEvent) => {
       e.preventDefault()
       const trimmed = input.trim()
-      if (!trimmed || loading) return
+      if (!trimmed || trimmed.length < 3 || loading) return
 
       setLoading(true)
       setError(null)
@@ -239,7 +239,7 @@ export default function PromptGenerator() {
 
                 <button
                   type="submit"
-                  disabled={!input.trim() || loading}
+                  disabled={!input.trim() || input.trim().length < 3 || loading}
                   className="flex items-center gap-2 rounded-xl btn-shimmer px-5 py-2.5 text-sm font-bold text-white shadow-brand-sm transition-transform hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-surface-deep disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:scale-100"
                 >
                   {loading ? (

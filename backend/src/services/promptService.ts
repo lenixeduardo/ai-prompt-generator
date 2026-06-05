@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from '@google/generative-ai'
+import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai'
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
 
@@ -49,7 +49,23 @@ export async function generateStructuredPrompt(userText: string): Promise<Prompt
   const model = genAI.getGenerativeModel({
     model: 'gemini-2.5-pro',
     systemInstruction: SYSTEM_PROMPT,
-    generationConfig: { maxOutputTokens: 2048 },
+    generationConfig: {
+      maxOutputTokens: 8192,
+      responseMimeType: 'application/json',
+      responseSchema: {
+        type: SchemaType.OBJECT,
+        properties: {
+          persona:         { type: SchemaType.STRING },
+          task:            { type: SchemaType.STRING },
+          context:         { type: SchemaType.STRING },
+          format:          { type: SchemaType.STRING },
+          examples:        { type: SchemaType.STRING },
+          optimizedPrompt: { type: SchemaType.STRING },
+          tags: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } },
+        },
+        required: ['persona', 'task', 'context', 'format', 'examples', 'optimizedPrompt', 'tags'],
+      },
+    },
   })
 
   let text: string
@@ -64,11 +80,10 @@ export async function generateStructuredPrompt(userText: string): Promise<Prompt
     )
   }
 
-  // Gemini occasionally wraps the JSON in markdown fences despite the prompt instruction
-  const clean = text.trim().replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim()
-
   try {
-    return JSON.parse(clean) as PromptOutput
+    const parsed = JSON.parse(text) as PromptOutput
+    if (!Array.isArray(parsed.tags)) parsed.tags = []
+    return parsed
   } catch {
     throw Object.assign(
       new Error('A IA retornou uma resposta malformada. Tente novamente.'),
