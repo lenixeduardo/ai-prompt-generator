@@ -1,34 +1,28 @@
 import type { NextRequest } from 'next/server'
+import { generateStructuredPrompt } from '@/lib/gemini'
 
 export async function POST(request: NextRequest) {
-  const apiUrl = process.env.API_URL ?? 'http://localhost:3001'
-
-  let body: unknown
+  let body: { text?: unknown }
   try {
     body = await request.json()
   } catch {
     return Response.json({ message: 'Requisição inválida.' }, { status: 400 })
   }
 
-  let response: Response
-  try {
-    response = await fetch(`${apiUrl}/api/generate`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-      signal: AbortSignal.timeout(25_000),
-    })
-  } catch (err) {
-    const isTimeout = err instanceof Error && err.name === 'TimeoutError'
-    console.error('[proxy] falha ao conectar ao backend:', err)
-    return Response.json(
-      { message: isTimeout
-          ? 'O servidor de IA demorou muito para responder. Tente novamente.'
-          : 'Não foi possível conectar ao servidor de IA.' },
-      { status: isTimeout ? 504 : 502 },
-    )
+  const text = typeof body?.text === 'string' ? body.text.trim() : ''
+  if (!text || text.length < 3) {
+    return Response.json({ message: 'Texto muito curto. Mínimo 3 caracteres.' }, { status: 400 })
+  }
+  if (text.length > 1000) {
+    return Response.json({ message: 'Texto muito longo. Máximo 1000 caracteres.' }, { status: 400 })
   }
 
-  const data = await response.json().catch(() => ({}))
-  return Response.json(data, { status: response.status })
+  try {
+    const result = await generateStructuredPrompt(text)
+    return Response.json(result)
+  } catch (err) {
+    const statusCode = (err as { statusCode?: number }).statusCode ?? 500
+    const message = err instanceof Error ? err.message : 'Erro interno do servidor.'
+    return Response.json({ message }, { status: statusCode })
+  }
 }
