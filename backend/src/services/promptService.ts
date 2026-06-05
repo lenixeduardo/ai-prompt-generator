@@ -45,6 +45,12 @@ export interface PromptOutput {
   tags: string[]
 }
 
+// Fallback chain: try each model in order until one succeeds
+const MODEL_CHAIN = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-flash-8b']
+
+// Auto-retry threshold: if retryAfter <= this value (seconds), wait and retry silently
+const AUTO_RETRY_MAX_WAIT = 15
+
 // In-memory response cache: key = normalised input, value = { result, expiry }
 const responseCache = new Map<string, { result: PromptOutput; expiry: number }>()
 const CACHE_TTL = 60 * 60 * 1000   // 1 hour
@@ -67,13 +73,22 @@ function setCached(key: string, result: PromptOutput): void {
   responseCache.set(key, { result, expiry: Date.now() + CACHE_TTL })
 }
 
-export async function generateStructuredPrompt(userText: string): Promise<PromptOutput> {
-  const cacheKey = userText.trim().toLowerCase()
-  const cached = getCached(cacheKey)
-  if (cached) return cached
+function isQuotaError(message: string): boolean {
+  return message.includes('429') || message.includes('quota') || message.includes('Too Many Requests')
+}
 
+function parseRetryAfter(message: string): number {
+  const match = message.match(/retry.*?(\d+(?:\.\d+)?)s/i)
+  return match ? Math.ceil(parseFloat(match[1])) : 60
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms))
+}
+
+async function callModel(modelName: string, userText: string): Promise<string> {
   const model = genAI.getGenerativeModel({
-    model: 'gemini-2.0-flash',
+    model: modelName,
     systemInstruction: SYSTEM_PROMPT,
     generationConfig: {
       maxOutputTokens: 2048,
@@ -93,24 +108,63 @@ export async function generateStructuredPrompt(userText: string): Promise<Prompt
       },
     },
   })
+  const result = await model.generateContent(userText)
+  return result.response.text()
+}
 
-  let text: string
-  try {
-    const result = await model.generateContent(userText)
-    text = result.response.text()
-  } catch (err) {
-    const message = err instanceof Error ? err.message : String(err)
-    if (message.includes('429') || message.includes('quota') || message.includes('Too Many Requests')) {
-      const retryMatch = message.match(/retry.*?(\d+(?:\.\d+)?)s/i)
-      const retryAfter = retryMatch ? Math.ceil(parseFloat(retryMatch[1])) : 60
-      throw Object.assign(
-        new Error(`Cota da API excedida. Tente novamente em ${retryAfter} segundos.`),
-        { statusCode: 429, retryAfter },
-      )
+export async function generateStructuredPrompt(userText: string): Promise<PromptOutput> {
+  const cacheKey = userText.trim().toLowerCase()
+  const cached = getCached(cacheKey)
+  if (cached) return cached
+
+  let lastErr: unknown
+  let text: string | undefined
+
+  for (const modelName of MODEL_CHAIN) {
+    try {
+      text = await callModel(modelName, userText)
+      lastErr = undefined
+      break
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err)
+
+      if (!isQuotaError(message)) {
+        throw Object.assign(
+          new Error(`Falha ao chamar a API Gemini: ${message}`),
+          { statusCode: 502 },
+        )
+      }
+
+      const retryAfter = parseRetryAfter(message)
+      lastErr = err
+
+      if (retryAfter <= AUTO_RETRY_MAX_WAIT) {
+        await sleep(retryAfter * 1000)
+        try {
+          text = await callModel(modelName, userText)
+          lastErr = undefined
+          break
+        } catch (retryErr) {
+          const retryMsg = retryErr instanceof Error ? retryErr.message : String(retryErr)
+          if (!isQuotaError(retryMsg)) {
+            throw Object.assign(
+              new Error(`Falha ao chamar a API Gemini: ${retryMsg}`),
+              { statusCode: 502 },
+            )
+          }
+          lastErr = retryErr
+        }
+      }
+      // quota still exceeded — try next model in chain
     }
+  }
+
+  if (text === undefined) {
+    const message = lastErr instanceof Error ? lastErr.message : String(lastErr)
+    const retryAfter = parseRetryAfter(message)
     throw Object.assign(
-      new Error(`Falha ao chamar a API Gemini: ${message}`),
-      { statusCode: 502 },
+      new Error(`Cota da API excedida em todos os modelos. Tente novamente em ${retryAfter} segundos.`),
+      { statusCode: 429, retryAfter },
     )
   }
 
