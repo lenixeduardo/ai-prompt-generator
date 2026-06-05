@@ -45,12 +45,38 @@ export interface PromptOutput {
   tags: string[]
 }
 
+// In-memory response cache: key = normalised input, value = { result, expiry }
+const responseCache = new Map<string, { result: PromptOutput; expiry: number }>()
+const CACHE_TTL = 60 * 60 * 1000   // 1 hour
+const CACHE_MAX_SIZE = 200
+
+function getCached(key: string): PromptOutput | null {
+  const entry = responseCache.get(key)
+  if (!entry) return null
+  if (Date.now() > entry.expiry) {
+    responseCache.delete(key)
+    return null
+  }
+  return entry.result
+}
+
+function setCached(key: string, result: PromptOutput): void {
+  if (responseCache.size >= CACHE_MAX_SIZE) {
+    responseCache.delete(responseCache.keys().next().value as string)
+  }
+  responseCache.set(key, { result, expiry: Date.now() + CACHE_TTL })
+}
+
 export async function generateStructuredPrompt(userText: string): Promise<PromptOutput> {
+  const cacheKey = userText.trim().toLowerCase()
+  const cached = getCached(cacheKey)
+  if (cached) return cached
+
   const model = genAI.getGenerativeModel({
-    model: 'gemini-2.5-pro',
+    model: 'gemini-2.0-flash',
     systemInstruction: SYSTEM_PROMPT,
     generationConfig: {
-      maxOutputTokens: 8192,
+      maxOutputTokens: 2048,
       responseMimeType: 'application/json',
       responseSchema: {
         type: SchemaType.OBJECT,
@@ -74,6 +100,14 @@ export async function generateStructuredPrompt(userText: string): Promise<Prompt
     text = result.response.text()
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err)
+    if (message.includes('429') || message.includes('quota') || message.includes('Too Many Requests')) {
+      const retryMatch = message.match(/retry.*?(\d+(?:\.\d+)?)s/i)
+      const retryAfter = retryMatch ? Math.ceil(parseFloat(retryMatch[1])) : 60
+      throw Object.assign(
+        new Error(`Cota da API excedida. Tente novamente em ${retryAfter} segundos.`),
+        { statusCode: 429, retryAfter },
+      )
+    }
     throw Object.assign(
       new Error(`Falha ao chamar a API Gemini: ${message}`),
       { statusCode: 502 },
@@ -83,6 +117,7 @@ export async function generateStructuredPrompt(userText: string): Promise<Prompt
   try {
     const parsed = JSON.parse(text) as PromptOutput
     if (!Array.isArray(parsed.tags)) parsed.tags = []
+    setCached(cacheKey, parsed)
     return parsed
   } catch {
     throw Object.assign(
