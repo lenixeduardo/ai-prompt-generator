@@ -276,50 +276,51 @@ export default function HeroPage() {
           {/* Hero body */}
           <div className="px-5 pt-7 pb-2 relative z-10">
 
-            {/* Cat — absolutely positioned top-right */}
-            <div className="absolute right-0 top-0 w-[48%] z-10" style={{ height: '330px' }}>
-              <div className="relative w-full h-full">
+            {/* Top row: heading on left, cat on right */}
+            <div className="flex items-start gap-2">
+
+              {/* Left: headings only (constrained column) */}
+              <div className="flex-1 min-w-0">
+                <h1 className="text-[32px] font-extrabold leading-[1.1] tracking-tight text-[#0F3D2E]">
+                  Aprenda<br />
+                  Engenharia<br />
+                  de Prompts
+                </h1>
+
+                <div className="mt-1">
+                  <p className="text-[31px] font-extrabold leading-[1.12] tracking-tight text-[#22C55E]">
+                    do zero ao
+                  </p>
+                  <div className="flex items-center gap-0.5">
+                    <p className="text-[31px] font-extrabold leading-[1.12] tracking-tight text-[#22C55E]">
+                      avançado
+                    </p>
+                    <span className="text-[26px] leading-none ml-0.5">⚡</span>
+                    <span className="text-[26px] leading-none">⚡</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right: cat image — same flex row, -mt to pull up */}
+              <div className="relative flex-shrink-0 w-[44%] -mt-5 -mr-3">
                 {/* Sparkle beside cat */}
-                <div className="absolute left-2 top-12 text-[#22C55E] z-20">
+                <div className="absolute top-10 left-0 text-[#22C55E] z-10">
                   <Sparkle size={10} />
                 </div>
-                <Image
-                  src="/mascot.png"
-                  alt="Mascote PromptLabz — gato estudioso com capelo"
-                  fill
-                  className="object-contain object-bottom drop-shadow-lg"
-                  priority
-                />
-              </div>
-            </div>
-
-            {/* Heading — left 66% (cat at z-10 overlaps the right edge) */}
-            <div className="w-[66%]">
-              <h1 className="text-[38px] font-extrabold leading-[1.08] tracking-tight text-[#0F3D2E]">
-                Aprenda<br />
-                Engenharia<br />
-                de Prompts
-              </h1>
-
-              <div className="mt-1">
-                <p className="text-[36px] font-extrabold leading-[1.12] tracking-tight text-[#22C55E]">
-                  do zero ao
-                </p>
-                <div className="flex items-center gap-1">
-                  <p className="text-[36px] font-extrabold leading-[1.12] tracking-tight text-[#22C55E]">
-                    avançado
-                  </p>
-                  <span className="text-[22px] leading-none">⚡</span>
-                  <span className="text-[22px] leading-none">⚡</span>
+                <div className="relative w-full" style={{ paddingBottom: '116%' }}>
+                  <Image
+                    src="/mascot.png"
+                    alt="Mascote PromptLabz — gato estudioso com capelo"
+                    fill
+                    className="object-contain object-bottom drop-shadow-lg"
+                    priority
+                  />
                 </div>
               </div>
             </div>
 
-            {/* Spacer so content clears the cat image */}
-            <div style={{ height: '32px' }} />
-
             {/* Description */}
-            <p className="text-[#0F3D2E] text-[14.5px] leading-[1.6] mt-0 mb-5 max-w-[230px]">
+            <p className="text-[#0F3D2E] text-[14px] leading-[1.6] mt-3 mb-5 max-w-[220px]">
               Domine ChatGPT, Claude e IA generativa com lições gamificadas.
               Do zero ao avançado, sem precisar saber programar.
             </p>
