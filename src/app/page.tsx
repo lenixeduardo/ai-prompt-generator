@@ -1,5 +1,9 @@
-import HeroPage from '@/components/HeroPage'
+import PromptGenerator from '@/components/PromptGenerator'
 
 export default function Home() {
-  return <HeroPage />
+  return (
+    <main className="min-h-screen bg-base">
+      <PromptGenerator />
+    </main>
+  )
 }
