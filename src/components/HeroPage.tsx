@@ -98,46 +98,17 @@ function FeatureCard({ illustration, title, description }: FeatureCardProps) {
   )
 }
 
-/* ── Laptop Cat SVG illustration (Lições práticas) ── */
+/* ── Cat-laptop illustration uses real asset ── */
 function CatLaptopIllustration() {
   return (
-    <svg width="64" height="56" viewBox="0 0 64 56" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      {/* Body */}
-      <ellipse cx="32" cy="40" rx="14" ry="10" fill="#4ADE80" />
-      {/* Head */}
-      <circle cx="32" cy="24" r="12" fill="#4ADE80" />
-      {/* Ears */}
-      <polygon points="22,16 18,8 26,14" fill="#4ADE80" />
-      <polygon points="42,16 46,8 38,14" fill="#4ADE80" />
-      {/* Inner ears */}
-      <polygon points="22,15 20,10 25,14" fill="#FCA5A5" />
-      <polygon points="42,15 44,10 39,14" fill="#FCA5A5" />
-      {/* Eyes */}
-      <circle cx="27" cy="23" r="3" fill="#111" />
-      <circle cx="37" cy="23" r="3" fill="#111" />
-      <circle cx="28" cy="22" r="1" fill="white" />
-      <circle cx="38" cy="22" r="1" fill="white" />
-      {/* Glasses */}
-      <circle cx="27" cy="23" r="4" fill="none" stroke="#111" strokeWidth="1.5" />
-      <circle cx="37" cy="23" r="4" fill="none" stroke="#111" strokeWidth="1.5" />
-      <line x1="31" y1="23" x2="33" y2="23" stroke="#111" strokeWidth="1.5" />
-      <line x1="23" y1="23" x2="20" y2="22" stroke="#111" strokeWidth="1.5" />
-      <line x1="41" y1="23" x2="44" y2="22" stroke="#111" strokeWidth="1.5" />
-      {/* Nose */}
-      <ellipse cx="32" cy="27" rx="1.5" ry="1" fill="#FCA5A5" />
-      {/* Laptop */}
-      <rect x="16" y="44" width="32" height="8" rx="2" fill="#1a1a2e" />
-      <rect x="18" y="36" width="28" height="10" rx="1.5" fill="#1E293B" />
-      <rect x="20" y="38" width="24" height="7" rx="1" fill="#0EA5E9" opacity="0.3" />
-      {/* Screen glow */}
-      <rect x="21" y="39" width="22" height="5" rx="0.8" fill="#22C55E" opacity="0.4" />
-      {/* Paw */}
-      <ellipse cx="20" cy="42" rx="4" ry="3" fill="#4ADE80" />
-      <ellipse cx="44" cy="42" rx="4" ry="3" fill="#4ADE80" />
-      {/* Sparkle */}
-      <path d="M10 12 L11 9 L12 12 L15 13 L12 14 L11 17 L10 14 L7 13 Z" fill="#22C55E" />
-      <path d="M52 8 L52.7 6 L53.4 8 L55.4 8.7 L53.4 9.4 L52.7 11.4 L52 9.4 L50 8.7 Z" fill="#22C55E" />
-    </svg>
+    <div className="relative w-[68px] h-[60px]">
+      <Image
+        src="/cat-laptop.png"
+        alt="Gato com laptop"
+        fill
+        className="object-contain"
+      />
+    </div>
   )
 }
 
@@ -291,7 +262,7 @@ export default function HeroPage() {
         </header>
 
         {/* ── Hero Section ── */}
-        <section className="bg-[#EEF9F2] relative overflow-hidden">
+        <section className="bg-[#E8F7EC] relative overflow-hidden">
 
           {/* Cloud decorations */}
           <CloudShape className="absolute top-4 right-[36%] opacity-60 scale-75" />
@@ -306,7 +277,7 @@ export default function HeroPage() {
           <div className="px-5 pt-7 pb-2 relative z-10">
 
             {/* Cat — absolutely positioned top-right */}
-            <div className="absolute right-0 top-0 w-[48%] z-10" style={{ height: '310px' }}>
+            <div className="absolute right-0 top-0 w-[48%] z-10" style={{ height: '330px' }}>
               <div className="relative w-full h-full">
                 {/* Sparkle beside cat */}
                 <div className="absolute left-2 top-12 text-[#22C55E] z-20">
@@ -322,24 +293,24 @@ export default function HeroPage() {
               </div>
             </div>
 
-            {/* Heading — left 58% */}
-            <div className="w-[58%]">
-              <h1 className="text-[34px] font-extrabold leading-[1.1] tracking-tight text-[#0F3D2E]">
+            {/* Heading — left 66% (cat at z-10 overlaps the right edge) */}
+            <div className="w-[66%]">
+              <h1 className="text-[38px] font-extrabold leading-[1.08] tracking-tight text-[#0F3D2E]">
                 Aprenda<br />
                 Engenharia<br />
                 de Prompts
               </h1>
 
               <div className="mt-1">
-                <p className="text-[33px] font-extrabold leading-[1.12] tracking-tight text-[#22C55E]">
+                <p className="text-[36px] font-extrabold leading-[1.12] tracking-tight text-[#22C55E]">
                   do zero ao
                 </p>
-                <div className="flex items-center gap-0.5">
-                  <p className="text-[33px] font-extrabold leading-[1.12] tracking-tight text-[#22C55E]">
+                <div className="flex items-center gap-1">
+                  <p className="text-[36px] font-extrabold leading-[1.12] tracking-tight text-[#22C55E]">
                     avançado
                   </p>
-                  <span className="text-[24px] leading-none ml-0.5">⚡</span>
-                  <span className="text-[20px] leading-none">⚡</span>
+                  <span className="text-[22px] leading-none">⚡</span>
+                  <span className="text-[22px] leading-none">⚡</span>
                 </div>
               </div>
             </div>
@@ -435,7 +406,7 @@ export default function HeroPage() {
         </section>
 
         {/* ── Social Proof Section ── */}
-        <section className="bg-[#EEF9F2] px-4 py-5">
+        <section className="bg-[#E8F7EC] px-4 py-5">
           <div className="flex items-center gap-3">
 
             {/* Heart + text */}
