@@ -132,19 +132,17 @@ function TrophyIllustration() {
   )
 }
 
-/* ── Flame SVG ── */
+/* ── Flame illustration uses real asset ── */
 function FlameIllustration() {
   return (
-    <svg width="48" height="60" viewBox="0 0 48 60" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      {/* Outer flame */}
-      <path d="M24 4 C24 4 36 16 36 30 C36 42.15 31 52 24 56 C17 52 12 42.15 12 30 C12 16 24 4 24 4 Z" fill="#EF4444" />
-      {/* Mid flame */}
-      <path d="M24 14 C24 14 32 24 32 33 C32 40.7 28.4 47 24 50 C19.6 47 16 40.7 16 33 C16 24 24 14 24 14 Z" fill="#F97316" />
-      {/* Inner flame */}
-      <path d="M24 24 C24 24 29 31 29 37 C29 41.97 26.76 46 24 48 C21.24 46 19 41.97 19 37 C19 31 24 24 24 24 Z" fill="#FCD34D" />
-      {/* Glow dot */}
-      <circle cx="24" cy="40" r="4" fill="#FEF08A" opacity="0.7" />
-    </svg>
+    <div className="relative w-[52px] h-[60px]">
+      <Image
+        src="/fire.jpeg"
+        alt="Chama de progresso"
+        fill
+        className="object-contain"
+      />
+    </div>
   )
 }
 
@@ -238,12 +236,12 @@ export default function HeroPage() {
         {/* ── Navigation Header ── */}
         <header className="bg-white flex items-center justify-between px-4 py-3 sticky top-0 z-30 shadow-[0_1px_0_#E8F7EC]">
           <div className="flex items-center gap-2">
-            <div className="relative w-9 h-9 rounded-xl overflow-hidden flex-shrink-0">
+            <div className="relative w-12 h-12 rounded-2xl overflow-hidden flex-shrink-0">
               <Image
                 src="/mascot.png"
                 alt="PromptLabz"
                 fill
-                className="object-cover object-top scale-[1.35] translate-y-1"
+                className="object-cover object-top scale-[1.4] translate-y-1"
                 priority
               />
             </div>
@@ -264,108 +262,103 @@ export default function HeroPage() {
         {/* ── Hero Section ── */}
         <section className="bg-[#E8F7EC] relative overflow-hidden">
 
-          {/* Cloud decorations */}
-          <CloudShape className="absolute top-4 right-[36%] opacity-60 scale-75" />
-          <CloudShape className="absolute top-0 right-4 opacity-40 scale-50" />
+          {/* Cloud */}
+          <CloudShape className="absolute top-5 right-[34%] opacity-70 z-10" />
 
-          {/* Sparkle top-right */}
-          <div className="absolute top-5 right-5 text-[#22C55E]">
-            <Sparkle size={22} />
+          {/* Sparkles */}
+          <div className="absolute top-5 right-5 text-[#22C55E] z-30">
+            <Sparkle size={24} />
+          </div>
+          <div className="absolute top-[130px] right-[46%] text-[#22C55E] z-30">
+            <Sparkle size={10} />
           </div>
 
-          {/* Hero body */}
-          <div className="px-5 pt-7 pb-2 relative z-10">
+          {/* Hero body — relative parent sizes the cat */}
+          <div className="relative">
 
-            {/* Top row: heading on left, cat on right */}
-            <div className="flex items-start gap-2">
+            {/* Cat mascot — absolute right, z-20 (above text) */}
+            <div className="absolute right-0 top-0 bottom-0 z-20" style={{ width: '48%' }}>
+              <Image
+                src="/mascot.png"
+                alt="Mascote PromptLabz — gato estudioso com capelo"
+                fill
+                className="object-cover object-top"
+                priority
+              />
+            </div>
 
-              {/* Left: headings only (constrained column) */}
-              <div className="flex-1 min-w-0">
-                <h1 className="text-[32px] font-extrabold leading-[1.1] tracking-tight text-[#0F3D2E]">
-                  Aprenda<br />
-                  Engenharia<br />
-                  de Prompts
-                </h1>
+            {/* Text content — full section width, cat overlaps from right at z-20 */}
+            <div className="relative z-10 pl-5 pt-8 pb-0">
 
-                <div className="mt-1">
-                  <p className="text-[31px] font-extrabold leading-[1.12] tracking-tight text-[#22C55E]">
-                    do zero ao
+              {/* H1 — large, full width; cat overlaps the right portion */}
+              <h1 className="text-[44px] font-extrabold leading-[1.08] tracking-tight text-[#0F3D2E]">
+                Aprenda<br />
+                Engenharia<br />
+                de Prompts
+              </h1>
+
+              {/* Green subtitle — same scale */}
+              <div className="mt-1">
+                <p className="text-[42px] font-extrabold leading-[1.1] tracking-tight text-[#22C55E]">
+                  do zero ao
+                </p>
+                <div className="flex items-center gap-1">
+                  <p className="text-[42px] font-extrabold leading-[1.1] tracking-tight text-[#22C55E]">
+                    avançado
                   </p>
-                  <div className="flex items-center gap-0.5">
-                    <p className="text-[31px] font-extrabold leading-[1.12] tracking-tight text-[#22C55E]">
-                      avançado
-                    </p>
-                    <span className="text-[26px] leading-none ml-0.5">⚡</span>
-                    <span className="text-[26px] leading-none">⚡</span>
+                  <LightningBolt size={30} color="#22C55E" />
+                </div>
+              </div>
+
+              {/* Description — constrained width so it doesn't extend under cat */}
+              <p className="text-[#0F3D2E] text-[13.5px] leading-[1.6] mt-3 mb-5 max-w-[240px]">
+                Domine ChatGPT, Claude e IA generativa com lições gamificadas.
+                Do zero ao avançado, sem precisar saber programar.
+              </p>
+
+              {/* CTA Button — explicit width, NOT full screen */}
+              <button
+                className="bg-[#0F3D2E] text-white font-bold text-[13px] uppercase tracking-[0.1em] py-[15px] rounded-full flex items-center justify-center gap-2.5 shadow-[0_4px_20px_rgba(15,61,46,0.35)] hover:bg-[#1a5c44] active:scale-[0.98] transition-all mb-5"
+                style={{ width: '240px' }}
+              >
+                COMEÇAR AGORA
+                <ArrowRight />
+              </button>
+
+              {/* Stats — compact, fit within visible area before cat */}
+              <div className="flex items-center gap-[6px] flex-wrap pb-4" style={{ maxWidth: '210px' }}>
+                <div className="flex items-center gap-[3px]">
+                  <BookOpen />
+                  <div className="leading-none">
+                    <div className="text-[11px] font-bold text-[#0F3D2E]">68+</div>
+                    <div className="text-[9px] text-[#0F3D2E]">lições</div>
+                  </div>
+                </div>
+
+                <span className="text-[#22C55E] text-[8px] font-black">•</span>
+
+                <div className="flex items-center gap-[3px]">
+                  <LightningBolt size={12} color="#22C55E" />
+                  <span className="text-[10px] font-semibold text-[#0F3D2E]">Gamificado</span>
+                </div>
+
+                <span className="text-[#22C55E] text-[8px] font-black">•</span>
+
+                <div className="flex items-center gap-[3px]">
+                  <ShieldCheck />
+                  <div className="leading-none">
+                    <div className="text-[11px] font-bold text-[#0F3D2E]">100%</div>
+                    <div className="text-[9px] text-[#0F3D2E]">grátis</div>
                   </div>
                 </div>
               </div>
-
-              {/* Right: cat image — same flex row, -mt to pull up */}
-              <div className="relative flex-shrink-0 w-[44%] -mt-5 -mr-3">
-                {/* Sparkle beside cat */}
-                <div className="absolute top-10 left-0 text-[#22C55E] z-10">
-                  <Sparkle size={10} />
-                </div>
-                <div className="relative w-full" style={{ paddingBottom: '116%' }}>
-                  <Image
-                    src="/mascot.png"
-                    alt="Mascote PromptLabz — gato estudioso com capelo"
-                    fill
-                    className="object-contain object-bottom drop-shadow-lg"
-                    priority
-                  />
-                </div>
-              </div>
             </div>
 
-            {/* Description */}
-            <p className="text-[#0F3D2E] text-[14px] leading-[1.6] mt-3 mb-5 max-w-[220px]">
-              Domine ChatGPT, Claude e IA generativa com lições gamificadas.
-              Do zero ao avançado, sem precisar saber programar.
-            </p>
-
-            {/* CTA Button */}
-            <button className="w-full bg-[#0F3D2E] text-white font-bold text-[13.5px] uppercase tracking-[0.12em] py-[15px] rounded-full flex items-center justify-center gap-2.5 shadow-[0_4px_20px_rgba(15,61,46,0.35)] hover:bg-[#1a5c44] active:scale-[0.98] transition-all mb-5">
-              COMEÇAR AGORA
-              <span className="text-lg font-bold">→</span>
-            </button>
-
-            {/* Stats row */}
-            <div className="flex items-center gap-3 mb-6">
-              {/* 68+ lições */}
-              <div className="flex items-center gap-1.5">
-                <BookOpen />
-                <div className="leading-none">
-                  <div className="text-[12px] font-bold text-[#0F3D2E]">68+</div>
-                  <div className="text-[11px] text-[#0F3D2E]">lições</div>
-                </div>
-              </div>
-
-              <span className="text-[#22C55E] text-[10px] font-black">●</span>
-
-              {/* Gamificado */}
-              <div className="flex items-center gap-1">
-                <span className="text-[14px] leading-none">⚡</span>
-                <span className="text-[12px] font-semibold text-[#0F3D2E]">Gamificado</span>
-              </div>
-
-              <span className="text-[#22C55E] text-[10px] font-black">●</span>
-
-              {/* 100% grátis */}
-              <div className="flex items-center gap-1.5">
-                <ShieldCheck />
-                <div className="leading-none">
-                  <div className="text-[12px] font-bold text-[#0F3D2E]">100%</div>
-                  <div className="text-[11px] text-[#0F3D2E]">grátis</div>
-                </div>
-              </div>
+            {/* Hills landscape — inside the relative container so cat's bottom-0
+                extends through the hills, making the cat appear to stand on terrain */}
+            <div className="relative z-0 -mb-1">
+              <HillsBackground />
             </div>
-          </div>
-
-          {/* Hills landscape */}
-          <div className="relative -mb-1 z-0">
-            <HillsBackground />
           </div>
         </section>
 
